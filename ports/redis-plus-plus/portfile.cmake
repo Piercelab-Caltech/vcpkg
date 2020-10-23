@@ -4,8 +4,8 @@ vcpkg_fail_port_install(ON_TARGET "Windows")
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO sewenew/redis-plus-plus
-    REF b08b36a9a91de00636e583307610f49af7876f50 # 1.1.2
-    SHA512 6dcead9fca9e7082ace28dcd72a1b325e229297080eea3e5a28ef5e6b9e4a7d1bcb3568997a5e7a031d7937a025a017ed92d7869db5829ba6113783c84bc5a68
+    REF 59552fa6c49dddffc20f8eb32f8c8f00ff2daed1 # 1.2.0
+    SHA512 1ea7bdc089dbb61bddf67c168b1b594ac859125c3cf4507dde2bfbe45e36e383085fc06fba9906d6ff4ab05669d36513dba99fa048d0b220efd8ad17e1a4df54
     HEAD_REF master
 )
 
@@ -14,6 +14,7 @@ vcpkg_configure_cmake(
     PREFER_NINJA
     OPTIONS
         -DREDIS_PLUS_PLUS_BUILD_TEST=OFF
+        -DCMAKE_CXX_FLAGS="-DREDIS_PLUS_PLUS_HAS_STRING_VIEW=1"
 )
 
 vcpkg_install_cmake()
