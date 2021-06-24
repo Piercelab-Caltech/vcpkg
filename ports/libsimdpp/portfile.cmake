@@ -1,9 +1,9 @@
 # header-only library
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
-    REPO mfornace/libsimdpp
-    REF 2d7e8f288f0e685b35526f627b5cd20c73960543
-    SHA512 6c8feb401ea13487eb9fcf03bb097848e163f4e6acd3e3953b33f6c6756b3bec876e6779c67af4fe13231b4d2cc1d4553f6f77ccb79227c8cdf6ef2b333fbd7b
+    REPO p12tic/libsimdpp
+    REF 9dac213d6965bf57c7accf9dda6d16c3bed0e3ac
+    SHA512 d90af5d34bd8f52e1a5917e17ad2b77d8cb2a50a93af45f2dc361ed4df276c9ac6d21f0e646a8c38235227eb10544388e5f3b476a8dface6acebb440b665c1fd
     HEAD_REF master
 )
 
