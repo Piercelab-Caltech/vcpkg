@@ -11,6 +11,8 @@ vcpkg_configure_cmake(
     PREFER_NINJA
     OPTIONS
         -DBUILD_TESTING=OFF
+        -DCMAKE_CXX_FLAGS="-Ofast -march=native"
+        -DCMAKE_BUILD_TYPE=Release
 )
 
 vcpkg_install_cmake()
