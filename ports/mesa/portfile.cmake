@@ -5,6 +5,14 @@
 set(PATCHES
     # Fix swrAVX512 build
     swravx512-post-static-link.patch
+    # Fix swr build with MSVC
+    swr-msvc-2.patch
+    # Fix swr build with LLVM 13
+    swr-llvm13.patch
+    # Fix radv MSVC build with LLVM 13
+    radv-msvc-llvm13-2.patch
+    # Fix d3d10sw MSVC build
+    d3d10sw.patch
 )
 
 vcpkg_check_linkage(ONLY_DYNAMIC_CRT)
@@ -16,8 +24,9 @@ vcpkg_from_gitlab(
     GITLAB_URL https://gitlab.freedesktop.org
     OUT_SOURCE_PATH SOURCE_PATH
     REPO mesa/mesa
-    REF mesa-21.1.2 
-    SHA512 746ef292dd93ddd23ab34e18e87196db63302defd99357f31ac24876003c75b32cfa8ed38d0292271cd9142a056f6a6549ffcd0f086d0c69c4ff83ac7195188c
+    REF mesa-21.2.5
+    SHA512 a9ead27f08e862738938cf728928b7937ff37e4c26967f2e46e40a3c8419159397f75b2f4ce43f9b453b35bb3716df581087fb7ba8434fafdfab9488c3db6f92
+    FILE_DISAMBIGUATOR 1
     HEAD_REF master
     PATCHES ${PATCHES}
 ) 
@@ -174,14 +183,14 @@ vcpkg_configure_meson(
 vcpkg_install_meson()
 vcpkg_fixup_pkgconfig()
 
-file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/debug/include)
-file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/debug/share)
+file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/include")
+file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/share")
 
 #installed by egl-registry
-file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/include/KHR)
-file(REMOVE ${CURRENT_PACKAGES_DIR}/include/EGL/egl.h)
-file(REMOVE ${CURRENT_PACKAGES_DIR}/include/EGL/eglext.h)
-file(REMOVE ${CURRENT_PACKAGES_DIR}/include/EGL/eglplatform.h)
+file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/include/KHR")
+file(REMOVE "${CURRENT_PACKAGES_DIR}/include/EGL/egl.h")
+file(REMOVE "${CURRENT_PACKAGES_DIR}/include/EGL/eglext.h")
+file(REMOVE "${CURRENT_PACKAGES_DIR}/include/EGL/eglplatform.h")
 #installed by opengl-registry
 set(_double_files include/GL/glcorearb.h include/GL/glext.h include/GL/glxext.h 
     include/GLES/egl.h include/GLES/gl.h include/GLES/glext.h include/GLES/glplatform.h 
@@ -190,8 +199,8 @@ set(_double_files include/GL/glcorearb.h include/GL/glext.h include/GL/glxext.h
 list(TRANSFORM _double_files PREPEND "${CURRENT_PACKAGES_DIR}/")
 file(REMOVE ${_double_files})
 
-file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/include/GLES)
-file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/include/GLES2)
-# # Handle copyright
+file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/include/GLES")
+file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/include/GLES2")
+# Handle copyright
 file(MAKE_DIRECTORY "${CURRENT_PACKAGES_DIR}/share/${PORT}")
 file(TOUCH "${CURRENT_PACKAGES_DIR}/share/${PORT}/copyright")
