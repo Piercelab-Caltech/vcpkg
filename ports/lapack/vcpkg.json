@@ -4,5 +4,13 @@
   "description": "Metapackage for packages which provide LAPACK",
   "license": null,
   "dependencies": [
+    {
+      "name": "clapack",
+      "platform": "(arm & windows) | uwp"
+    },
+    {
+      "name": "lapack-reference",
+      "platform": "!((arm & windows) | uwp | osx)"
+    }
   ]
 }
