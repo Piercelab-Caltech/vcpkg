@@ -19,7 +19,8 @@ file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/include")
 # Include architecture detection
 configure_file("${SOURCE_PATH}/cmake/SimdppMultiarch.cmake" "${SOURCE_PATH}/libsimdpp-config.cmake" COPYONLY)
 file(APPEND "${SOURCE_PATH}/libsimdpp-config.cmake" [=[
-    set(LIBSIMDPP_INCLUDE_DIRS "${CURRENT_PACKAGES_DIR}/include/libsimdpp-2.1")
+find_path(LIBSIMDPP_INCLUDE_ROOT "libsimdpp-2.1/simdpp/capabilities.h")
+set(LIBSIMDPP_INCLUDE_DIRS "${LIBSIMDPP_INCLUDE_ROOT}/libsimdpp-2.1")
 ]=])
 file(INSTALL "${SOURCE_PATH}/libsimdpp-config.cmake" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}")
 
