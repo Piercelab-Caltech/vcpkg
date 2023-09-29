@@ -2,26 +2,26 @@
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO p12tic/libsimdpp
-    REF 9dac213d6965bf57c7accf9dda6d16c3bed0e3ac
-    SHA512 d90af5d34bd8f52e1a5917e17ad2b77d8cb2a50a93af45f2dc361ed4df276c9ac6d21f0e646a8c38235227eb10544388e5f3b476a8dface6acebb440b665c1fd
+    REF 16878c9a877aca6022270176738fb5046ed25aa5
+    SHA512 5b394f7252768e62a71f5c19bf1e85faed8fe3f07a645abdbc01061f86c166efab2422cb45a7ec374c94784d83f8df501363d233f162f15660d464425eb96304
     HEAD_REF master
 )
 
-vcpkg_configure_cmake(
+vcpkg_cmake_configure(
     SOURCE_PATH ${SOURCE_PATH}
-    PREFER_NINJA
 )
 
-vcpkg_install_cmake()
+vcpkg_cmake_install()
 vcpkg_fixup_pkgconfig()
 
 file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/include")
 
 # Include architecture detection
 configure_file("${SOURCE_PATH}/cmake/SimdppMultiarch.cmake" "${SOURCE_PATH}/libsimdpp-config.cmake" COPYONLY)
-file(APPEND "${SOURCE_PATH}/libsimdpp-config.cmake" "\nset(LIBSIMDPP_INCLUDE_DIRS \"${CURRENT_PACKAGES_DIR}/include/libsimdpp-2.1\")\n")
+file(APPEND "${SOURCE_PATH}/libsimdpp-config.cmake" [=[
+    set(LIBSIMDPP_INCLUDE_DIRS "${CURRENT_PACKAGES_DIR}/include/libsimdpp-2.1")
+]=])
 file(INSTALL "${SOURCE_PATH}/libsimdpp-config.cmake" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}")
 
 # Handle copyright
 file(INSTALL ${SOURCE_PATH}/LICENSE_1_0.txt DESTINATION ${CURRENT_PACKAGES_DIR}/share/${PORT} RENAME copyright)
-
