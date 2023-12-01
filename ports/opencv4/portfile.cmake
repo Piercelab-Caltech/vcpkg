@@ -2,8 +2,8 @@ set(USE_QT_VERSION "6")
 
 # https://github.com/opencv/opencv/pull/24043
 vcpkg_download_distfile(ARM64_WINDOWS_FIX
-  URLS https://github.com/opencv/opencv/commit/e5e1a3bfdea96bebda2ad963bc8f6cf17930aef7.patch
-  SHA512 b91b45ac49994c3f4481d5ca04d708d9b063239fd2105e2eb1aae26cc70361ff042e99c51edd67beb9463624147ba77fd562097ab20676bba3b8ce068d455dbc
+  URLS https://github.com/opencv/opencv/commit/e5e1a3bfdea96bebda2ad963bc8f6cf17930aef7.patch?full_index=1
+  SHA512 8ae2544e4a7ece19efe21261acc183f91202ac5352c1ac42fb86bf33d698352eff1b8962422b092240f4e8c7a691e9aa5ef20d6070adcd37e92bb94c6010ce56
   FILENAME opencv4-e5e1a3bfdea96bebda2ad963bc8f6cf17930aef7.patch
 )
 
@@ -27,6 +27,9 @@ vcpkg_from_github(
       0012-fix-zlib.patch
       0015-fix-freetype.patch
       0017-fix-flatbuffers.patch
+      0019-missing-include.patch
+      0020-fix-compat-cuda12.2.patch
+      0021-static-openvino.patch # https://github.com/opencv/opencv/pull/23963
       "${ARM64_WINDOWS_FIX}"
 )
 # Disallow accidental build of vendored copies
@@ -65,11 +68,14 @@ vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
  "gtk"       WITH_GTK
  "halide"    WITH_HALIDE
  "jasper"    WITH_JASPER
+ "openjpeg"  WITH_OPENJPEG
  "jpeg"      WITH_JPEG
  "lapack"    WITH_LAPACK
  "nonfree"   OPENCV_ENABLE_NONFREE
+ "openvino"  WITH_OPENVINO
  "openexr"   WITH_OPENEXR
  "opengl"    WITH_OPENGL
+ "ovis"      CMAKE_REQUIRE_FIND_PACKAGE_OGRE
  "png"       WITH_PNG
  "quirc"     WITH_QUIRC
  "sfm"       BUILD_opencv_sfm
@@ -182,6 +188,7 @@ if("contrib" IN_LIST FEATURES)
       0007-fix-hdf5.patch
       0016-fix-freetype-contrib.patch
       0018-fix-depend-tesseract.patch
+      0019-fix-ogre-dependency.patch
   )
   set(BUILD_WITH_CONTRIB_FLAG "-DOPENCV_EXTRA_MODULES_PATH=${CONTRIB_SOURCE_PATH}/modules")
 
@@ -392,6 +399,7 @@ vcpkg_cmake_configure(
         -Dade_DIR=${ADE_DIR}
         ###### Disable build 3rd party libs
         -DBUILD_JASPER=OFF
+        -DBUILD_OPENJPEG=OFF
         -DBUILD_JPEG=OFF
         -DBUILD_OPENEXR=OFF
         -DBUILD_PNG=OFF
@@ -442,8 +450,8 @@ vcpkg_cmake_configure(
         -DWITH_PROTOBUF=${BUILD_opencv_dnn}
         -DWITH_PYTHON=${WITH_PYTHON}
         -DWITH_OPENCLAMDBLAS=OFF
+        -DWITH_OPENVINO=${WITH_OPENVINO}
         -DWITH_TBB=${WITH_TBB}
-        -DWITH_OPENJPEG=OFF
         -DWITH_CPUFEATURES=OFF
         ###### BUILD_options (mainly modules which require additional libraries)
         -DBUILD_opencv_ovis=${BUILD_opencv_ovis}
@@ -522,6 +530,9 @@ find_dependency(Tesseract)")
   if("lapack" IN_LIST FEATURES)
     string(APPEND DEPS_STRING "\nfind_dependency(LAPACK)")
   endif()
+  if(WITH_OPENVINO)
+    string(APPEND DEPS_STRING "\nfind_dependency(OpenVINO CONFIG)")
+  endif()
   if("openexr" IN_LIST FEATURES)
     string(APPEND DEPS_STRING "\nfind_dependency(OpenEXR CONFIG)")
   endif()
@@ -529,7 +540,7 @@ find_dependency(Tesseract)")
     string(APPEND DEPS_STRING "\nfind_dependency(OpenMP)")
   endif()
   if(BUILD_opencv_ovis)
-    string(APPEND DEPS_STRING "\nfind_dependency(Ogre)")
+    string(APPEND DEPS_STRING "\nfind_dependency(OGRE)")
   endif()
   if("quirc" IN_LIST FEATURES)
     string(APPEND DEPS_STRING "\nfind_dependency(quirc)")
@@ -583,6 +594,12 @@ file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/share/opencv")
 if(VCPKG_TARGET_IS_ANDROID)
   file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/README.android")
   file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/README.android")
+endif()
+
+if("python" IN_LIST FEATURES)
+  file(GLOB python_dir LIST_DIRECTORIES true RELATIVE "${CURRENT_PACKAGES_DIR}/lib/" "${CURRENT_PACKAGES_DIR}/lib/python*")
+  file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/lib/${python_dir}/site-packages/cv2/typing")
+  file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/lib/${python_dir}/site-packages/cv2/typing")
 endif()
 
 vcpkg_fixup_pkgconfig()
